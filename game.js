@@ -5,7 +5,7 @@ $(function(){
             x: 0,
             y: 0,
             w: 25,
-            h: 50,
+            h: 25,
             color: "#FF9000",
             linewidth: 3
             // don't define a default id, that leads to strange behaviors
@@ -17,8 +17,6 @@ $(function(){
     });
 
     var BoxView = Backbone.View.extend({
-        test: "Hoi",
-
         render: function() {
             var model = this.model, ctx = this.ctx;
 
@@ -43,18 +41,27 @@ $(function(){
     });
 
     var SetView= Backbone.View.extend({
-        initialize: function() {
+        initialize: function(args) {
+            this.shotCollection = args.shotCollection;
             this.listenTo(this.collection, "all", this.render);
+            this.listenTo(this.shotCollection, "all", this.render);
+            this.ctx =  this.el.getContext("2d");
         },
 
         render: function() {
-            var canvas = this.el, ctx = canvas.getContext("2d");
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            console.debug("Render CTX", ctx);
+            if(this.lastRender && (this.lastRender + 5) > new Date().getTime()) return;
+            console.log("Redrawing", this);
+            var ctx = this.ctx;
+            ctx.clearRect(0, 0, this.el.width, this.el.height);
             this.collection.each(function(model) {
-                var view = new BoxView({ctx: ctx, model: model});
-                view.render();
-            })
+                if(!model.view) model.view = new BoxView({ctx: ctx, model: model});
+                model.view.render();
+            });
+            this.shotCollection.each(function(model){
+                if(!model.view) model.view = new ShotView({ctx: ctx, model:model});
+                model.view.render();
+            });
+            this.lastRender = new Date().getTime();
         }
     });
     var player = new Box({x: 0, y: 450, color: 'magenta'});
@@ -63,11 +70,7 @@ $(function(){
     c.add(new Box({x: 150, y: 150}));
     c.add(new Box({x: 10, y: 10}));
 
-    var v = new SetView({
-        el: canvas[0],
-        collection : c
-    });
-    v.render();
+
     var counter = 0;
     /* Henk Jan */
     $(document).keydown(function(e){
@@ -94,6 +97,49 @@ $(function(){
 
 
     /* Sander */
+    var Shot = Backbone.Model.extend({
+        defaults: {
+            fromX: 0,
+            fromY: 0,
+            toX: 0,
+            toY: 0
+        }
+    });
 
+    var ShotSet = Backbone.Collection.extend({
+        model:Shot
+    });
 
+    var ShotView = Backbone.View.extend({
+        render: function() {
+            console.log("Rendering shot");
+            var model = this.model, ctx = this.ctx;
+            ctx.beginPath();
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = "yellow";
+            ctx.moveTo(model.get("fromX"), model.get("fromY"));
+            ctx.lineTo(model.get("toX"), model.get("toY"));
+            ctx.closePath();
+            ctx.stroke();
+        },
+        initialize: function(params){
+            this.ctx = params.ctx;
+        }
+    });
+    var shots = new ShotSet();
+    var v = new SetView({
+        el: canvas[0],
+        collection : c,
+        shotCollection: shots
+    });
+    v.render();
+
+    canvas.on("click", function(e){
+        var shot = new Shot({fromX: player.get("x") + 12.5, fromY: player.get("y") + 12.5, toX:e.offsetX, toY:e.offsetY});
+        shots.add(shot);
+        setTimeout(function(){
+            shots.remove(shot);
+        }, 100)
+    });
+    
 });
