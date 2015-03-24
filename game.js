@@ -1,5 +1,5 @@
 $(function(){
-    var canvas = $("canvas");
+    var canvas = $("canvas")
     var Box = Backbone.Model.extend({
         defaults: {
             x: 0,
@@ -133,9 +133,30 @@ $(function(){
         shotCollection: shots
     });
     v.render();
-
+    var AudioElement = function(src){
+        this.src = src;
+    };
+    AudioElement.prototype = {
+        defaultElement: undefined,
+        src: undefined,
+        play: function(){
+              if(!this.defaultElement){
+                  var audio =  this.createElement();
+                  this.defaultElement = audio[0];
+                  $(document.body).append(this.defaultElement);
+              }else{
+                  if(this.defaultElement.paused) this.defaultElement.play();
+                  else $(document.body).append(this.createElement().on("ended", function(){$(this).remove()}));
+              }
+        },
+        createElement: function(){
+            return  $("<audio/>").attr("src", this.src).attr("autoplay", "");
+        }
+    };
+    var shootAudio = new AudioElement("Javascriptgame/laser.mp3");
     canvas.on("click", function(e){
         var shot = new Shot({fromX: player.get("x") + 12.5, fromY: player.get("y") + 12.5, toX:e.offsetX, toY:e.offsetY});
+        shootAudio.play();
         shots.add(shot);
         setTimeout(function(){
             shots.remove(shot);
