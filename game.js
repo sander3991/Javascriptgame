@@ -165,6 +165,7 @@ $(function(){
         var shot = new Shot({fromX: player.get("x") + 12.5, fromY: player.get("y") + 12.5, toX:e.offsetX, toY:e.offsetY});
         shootAudio.play();
         shots.add(shot);
+
         // Check collisie 
         checkCollision(shot, c);
 
@@ -180,11 +181,19 @@ $(function(){
         //console.debug("shot y", shot.get("toY"));
 
         c.each(function (obj) {
-            for (x = 0; x < 25; x++) {
-                for (y = 0; y < 25; y++) {
-                    if ((obj.get("x") + x == shot.get("toX")) && (obj.get("y") + y == shot.get("toY"))) {
-                        console.debug("Raak");
-                    }   
+            // kijk of het object er nog is
+            if (obj != null) {
+                for (x = 0; x < 25; x++) {
+                    for (y = 0; y < 25; y++) {
+                        // kijk of het object geraakt is
+                        if ((obj.get("x") + x == shot.get("toX")) && (obj.get("y") + y == shot.get("toY"))) {
+                            // als het object geraakt is, verwijder het en return true 
+                            // zodat hij uit de each loop gaat.
+                            console.debug("Raak");
+                            c.remove(obj);
+                            return true;
+                        }   
+                    }
                 }
             }
         });
