@@ -176,27 +176,33 @@ $(function(){
 
 
     function checkCollision(shot, c) {
-        //console.debug("piew", shot);
-        //console.debug("shot x", shot.get("toX"));
-        //console.debug("shot y", shot.get("toY"));
-
-        c.each(function (obj) {
-            // kijk of het object er nog is
-            if (obj != null) {
-                for (x = 0; x < 25; x++) {
-                    for (y = 0; y < 25; y++) {
-                        // kijk of het object geraakt is
-                        if ((obj.get("x") + x == shot.get("toX")) && (obj.get("y") + y == shot.get("toY"))) {
-                            // als het object geraakt is, verwijder het en return true 
-                            // zodat hij uit de each loop gaat.
-                            console.debug("Raak");
-                            c.remove(obj);
-                            return true;
-                        }   
+        try {
+            c.each(function (obj) {
+                // Kijk of de speler zich zelf schiet
+                if (obj.get("color") == "magenta") {
+                    return false;
+                }
+                console.log("obj",obj);
+                // kijk of het object er nog is
+                if (obj != null) {
+                    // pak alle x en y coordinaten van het object
+                    for (x = 0; x < obj.get("w"); x++) {
+                        for (y = 0; y < obj.get("h"); y++) {
+                            // kijk of het object geraakt is
+                            if ((obj.get("x") + x == shot.get("toX")) && (obj.get("y") + y == shot.get("toY"))) {
+                                // als het object geraakt is, verwijder het
+                                // en throw een error zodat hij de functie afbreekt
+                                c.remove(obj);
+                                throw "Quit function";
+                            }   
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
+        catch (e) {
+            console.debug("Raak");
+        }
 
         
     }
