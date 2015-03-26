@@ -258,6 +258,7 @@ $(function(){
         addEnemy();
         addEnemy();
         GC.start();
+        enemySpawnRate = 300;
     }
 
     // Standaard spawn rate van vijanden
