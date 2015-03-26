@@ -83,9 +83,10 @@ $(function(){
         render: function () {
             var model = this.model, ctx = this.ctx;
             ctx.font = "48px serif";
-            ctx.strokeStyle = this.textColor;
+            ctx.fillStyle = this.textColor;
+            ctx.globalAlpha = 0.7;
             ctx.lineWidth = 1;
-            ctx.strokeText("Score: " + model.get("CurrentScore"), 10, 50);
+            ctx.fillText("Score: " + model.get("CurrentScore"), 10, 50);
         },
         initialize: function (params) {
             this.ctx = params.ctx;
@@ -122,11 +123,16 @@ $(function(){
         }
     });
     var player = new Box({x: 487, y: 237, color: 'magenta'});
+    function inBounds(from, to, value){
+        if(value > to) return to;
+        if(from > value) return from;
+        return value;
+    }
     GC.register(function(){
         if(player.moveX)
-            player.set("x", player.get("x") + player.moveX);
+            player.set("x", inBounds(0, 975, player.get("x") + player.moveX));
         if(player.moveY)
-            player.set("y", player.get("y") + player.moveY);
+            player.set("y", inBounds(0, 475, player.get("y") + player.moveY));
     });
     var c = new BoxSet();
     c.add(player);
@@ -348,8 +354,8 @@ $(function(){
         var shot = new Shot({
             fromX: player.get("x") + 12.5,
             fromY: player.get("y") + 12.5,
-            toX: e.offsetX || e.pageX - canvas.offset().left,
-            toY: e.offsetY || e.pageY - canvas.offset().top
+            toX: (e.offsetX || e.pageX - canvas.offset().left),
+            toY: (e.offsetY || e.pageY - canvas.offset().top)
         });
         console.debug("Shot", shot);
         shootAudio.play();
@@ -367,12 +373,14 @@ $(function(){
 
         try {
             var toX = shot.get("toX"),
-                toY = shot.get("toY");
+                toY = shot.get("toY"),
+                counter = 0;
             c.each(function (obj) {
                 // Kijk of de speler zich zelf schiet
                 if (obj == player) {
                     return;
                 }
+                console.log("Object " + counter++);
                 // kijk of het object er nog is
                 if (obj != null) {
                     // pak alle x en y coordinaten van het object
@@ -382,7 +390,7 @@ $(function(){
                         h = obj.get("h");
                     if(
                         toX >= x && (x + w) >= toX &&
-                        toY >= y && (x + h) >= toY
+                        toY >= y && (y + h) >= toY
                     ){
                         // als het object geraakt is, verwijder het
                         // en throw een error zodat hij de functie afbreekt
