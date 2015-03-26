@@ -247,12 +247,13 @@ $(function(){
         }
     }
     // Standaard spawn rate van vijanden
-    var enemySpawnRate = 60;
+    var enemySpawnRate = 300;
     GC.register(function (tick) {
         if (tick % enemySpawnRate == 0) {
             addEnemy();
             // Haal 20% van de spawnrate af bij elke spawn van een vijand
-            Math.round(enemySpawnRate / 5 * 4);
+            enemySpawnRate = Math.round(enemySpawnRate / 50 * 48);
+            console.debug("spawnrate ", enemySpawnRate);
             
         }
 
