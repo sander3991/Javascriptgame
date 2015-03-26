@@ -1,5 +1,7 @@
 $(function(){
     var canvas = $("canvas");
+    var scoreCounter = 0;
+
 
     var GameController = Backbone.Model.extend({
         initialize: function(){
@@ -39,7 +41,7 @@ $(function(){
             h: 25,
             color: "#FF9000",
             linewidth: 3,
-            alive: true,
+            alive: true
             // don't define a default id, that leads to strange behaviors
         }
     });
@@ -131,7 +133,6 @@ $(function(){
         });
     });
 
-    var counter = 0;
     /* Henk Jan */
 
     $(document).keydown(function (e) {
@@ -204,8 +205,13 @@ $(function(){
                 break;
         }
     }
+    
+    for (i = 0; i < 20; i++) {
+        addEnemy();
 
-    addEnemy();
+    }
+   
+    
 
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
@@ -305,6 +311,8 @@ $(function(){
                                 // als het object geraakt is, verwijder het
                                 // en throw een error zodat hij de functie afbreekt
                                 c.remove(obj);
+                                scoreCounter++;
+                                console.debug(scoreCounter);
                                 throw "Raak";
                             }
                         }
