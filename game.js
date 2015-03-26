@@ -85,12 +85,13 @@ $(function(){
         render: function () {
             var model = this.model, ctx = this.ctx;
             ctx.font = "48px serif";
-            ctx.strokeStyle = "black";
+            ctx.strokeStyle = this.textColor;
             ctx.lineWidth = 1;
             ctx.strokeText("Score: " + model.get("CurrentScore"), 10, 50);
         },
         initialize: function (params) {
             this.ctx = params.ctx;
+            this.textColor = canvas.attr("text-color");
         }
     });
     
