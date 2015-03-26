@@ -168,8 +168,12 @@ $(function(){
                     obj.set("y", ++y);
                 moved = true;
             }
-            if(moved && intersectRect(player, obj))
+            if(moved && intersectRect(player, obj)){
                 GC.stop();
+                var restart = confirm("Game over!\nScore: " + Score.get("CurrentScore") + "\n\nWil je een nieuw spel starten?");
+                if(restart)
+                    restartGame();
+            }
         });
     });
 
@@ -245,6 +249,17 @@ $(function(){
                 break;
         }
     }
+
+    function restartGame(){
+        c.reset();
+        player.set({x: 487, y: 237});
+        Score.set("CurrentScore", 0);
+        c.add(player);
+        addEnemy();
+        addEnemy();
+        GC.start();
+    }
+
     // Standaard spawn rate van vijanden
     var enemySpawnRate = 300;
     GC.register(function (tick) {
@@ -328,7 +343,13 @@ $(function(){
     var shootAudio = new AudioElement("Javascriptgame/laser.mp3");
     canvas.on("click", function(e){
         if(!GC.running()) return;
-        var shot = new Shot({ fromX: player.get("x") + 12.5, fromY: player.get("y") + 12.5, toX: e.offsetX, toY: e.offsetY });
+        var shot = new Shot({
+            fromX: player.get("x") + 12.5,
+            fromY: player.get("y") + 12.5,
+            toX: e.offsetX || e.pageX - canvas.offset().left,
+            toY: e.offsetY || e.pageY - canvas.offset().top
+        });
+        console.debug("Shot", shot);
         shootAudio.play();
         shots.add(shot);
 
@@ -343,6 +364,8 @@ $(function(){
     function checkCollision(shot, c) {
 
         try {
+            var toX = shot.get("toX"),
+                toY = shot.get("toY");
             c.each(function (obj) {
                 // Kijk of de speler zich zelf schiet
                 if (obj == player) {
@@ -351,19 +374,20 @@ $(function(){
                 // kijk of het object er nog is
                 if (obj != null) {
                     // pak alle x en y coordinaten van het object
-                    for (x = 0; x < obj.get("w"); x++) {
-                        for (y = 0; y < obj.get("h"); y++) {
-                            // kijk of het object geraakt is
-                            if ((obj.get("x") + x == shot.get("toX")) && (obj.get("y") + y == shot.get("toY"))) {
-                                // als het object geraakt is, verwijder het
-                                // en throw een error zodat hij de functie afbreekt
-                                c.remove(obj);
+                    var x = obj.get("x"),
+                        y = obj.get("y"),
+                        w = obj.get("w"),
+                        h = obj.get("h");
+                    if(
+                        toX >= x && (x + w) >= toX &&
+                        toY >= y && (x + h) >= toY
+                    ){
+                        // als het object geraakt is, verwijder het
+                        // en throw een error zodat hij de functie afbreekt
+                        c.remove(obj);
 
-                                Score.set("CurrentScore", Score.get("CurrentScore") + 1);
-                                throw "Raak";
-
-                            }
-                        }
+                        Score.set("CurrentScore", Score.get("CurrentScore") + 1);
+                        throw "Raak";
                     }
                 }
             });
