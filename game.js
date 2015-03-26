@@ -205,13 +205,16 @@ $(function(){
                 break;
         }
     }
-    
-    for (i = 0; i < 20; i++) {
-        addEnemy();
+    var enemySpawnRate = 60;
+    GC.register(function (tick) {
+        if (tick % enemySpawnRate == 0) {
+            addEnemy();
+            Math.round(enemySpawnRate / 5 * 4);
+            
+        }
 
-    }
+    });
    
-    
 
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
