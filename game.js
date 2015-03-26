@@ -83,10 +83,9 @@ $(function(){
         render: function () {
             var model = this.model, ctx = this.ctx;
             ctx.font = "48px serif";
-            ctx.fillStyle = this.textColor;
-            ctx.globalAlpha = 0.7;
+            ctx.strokeStyle = this.textColor;
             ctx.lineWidth = 1;
-            ctx.fillText("Score: " + model.get("CurrentScore"), 10, 50);
+            ctx.strokeText("Score: " + model.get("CurrentScore"), 10, 50);
         },
         initialize: function (params) {
             this.ctx = params.ctx;
@@ -123,16 +122,11 @@ $(function(){
         }
     });
     var player = new Box({x: 487, y: 237, color: 'magenta'});
-    function inBounds(from, to, value){
-        if(value > to) return to;
-        if(from > value) return from;
-        return value;
-    }
     GC.register(function(){
         if(player.moveX)
-            player.set("x", inBounds(0, 975, player.get("x") + player.moveX));
+            player.set("x", player.get("x") + player.moveX);
         if(player.moveY)
-            player.set("y", inBounds(0, 475, player.get("y") + player.moveY));
+            player.set("y", player.get("y") + player.moveY);
     });
     var c = new BoxSet();
     c.add(player);
@@ -233,7 +227,7 @@ $(function(){
         }
     });
     function getRandomColor() {
-        var letters = '0123456789ABCD'.split('');
+        var letters = '0123456789ABCDEF'.split('');
         var color = '#';
         for (var i = 0; i < 6; i++) {
             color += letters[Math.floor(Math.random() * 16)];
@@ -244,22 +238,23 @@ $(function(){
     function addEnemy() {
         var spawnPosition = getRandomInt(1, 5);
         var color = getRandomColor();
+        var randomStrokeColor = getRandomColor();
         switch (spawnPosition) {
             case (1): // spawn enemy boven in het scherm
                 var tempX = getRandomInt(0, 1000);
-                c.add(new Box({ x: tempX, y: -25 ,color:color}));
+                c.add(new Box({ x: tempX, y: -25, color: color, strokeColor: randomStrokeColor }));
                 break;
             case (2): // spawn enemy onder in het scherm
                 var tempX = getRandomInt(0, 1000);
-                c.add(new Box({ x: tempX, y: 525, color: color }));
+                c.add(new Box({ x: tempX, y: 525, color: color, strokeColor: randomStrokeColor }));
                 break;
             case (3): //spawn enemy links in het scherm
                 var tempY = getRandomInt(0, 500)
-                c.add(new Box({ x: -25, y: tempY, color: color }));
+                c.add(new Box({ x: -25, y: tempY, color: color, strokeColor: randomStrokeColor }));
                 break;
             case (4): // spawn enemy rechts in het scherm
                 var tempY = getRandomInt(0, 500)
-                c.add(new Box({ x: 1025, y: tempY, color: color }));
+                c.add(new Box({ x: 1025, y: tempY, color: color, strokeColor: randomStrokeColor }));
                 break;
         }
     }
@@ -363,8 +358,8 @@ $(function(){
         var shot = new Shot({
             fromX: player.get("x") + 12.5,
             fromY: player.get("y") + 12.5,
-            toX: (e.offsetX || e.pageX - canvas.offset().left),
-            toY: (e.offsetY || e.pageY - canvas.offset().top)
+            toX: e.offsetX || e.pageX - canvas.offset().left,
+            toY: e.offsetY || e.pageY - canvas.offset().top
         });
         console.debug("Shot", shot);
         shootAudio.play();
@@ -382,14 +377,12 @@ $(function(){
 
         try {
             var toX = shot.get("toX"),
-                toY = shot.get("toY"),
-                counter = 0;
+                toY = shot.get("toY");
             c.each(function (obj) {
                 // Kijk of de speler zich zelf schiet
                 if (obj == player) {
                     return;
                 }
-                console.log("Object " + counter++);
                 // kijk of het object er nog is
                 if (obj != null) {
                     // pak alle x en y coordinaten van het object
@@ -399,7 +392,7 @@ $(function(){
                         h = obj.get("h");
                     if(
                         toX >= x && (x + w) >= toX &&
-                        toY >= y && (y + h) >= toY
+                        toY >= y && (x + h) >= toY
                     ){
                         // als het object geraakt is, verwijder het
                         // en throw een error zodat hij de functie afbreekt
