@@ -51,7 +51,6 @@ $(function(){
 
         render: function() {
             if(this.lastRender && (this.lastRender + 5) > new Date().getTime()) return;
-            console.log("Redrawing", this);
             var ctx = this.ctx;
             ctx.clearRect(0, 0, this.el.width, this.el.height);
             this.collection.each(function(model) {
@@ -119,7 +118,6 @@ $(function(){
 
     var ShotView = Backbone.View.extend({
         render: function() {
-            console.log("Rendering shot");
             var model = this.model, ctx = this.ctx;
             ctx.beginPath();
             ctx.lineWidth = 1;
@@ -163,7 +161,6 @@ $(function(){
     var shootAudio = new AudioElement("Javascriptgame/laser.mp3");
     canvas.on("click", function(e){
         var shot = new Shot({ fromX: player.get("x") + 12.5, fromY: player.get("y") + 12.5, toX: e.offsetX, toY: e.offsetY });
-        console.debug("shot", shot);
 
         shootAudio.play();
         shots.add(shot);
@@ -173,17 +170,16 @@ $(function(){
 
         setTimeout(function(){
             shots.remove(shot);
-        }, 100)
+        }, 50)
     });
 
     function checkCollision(shot, c) {
         try {
             c.each(function (obj) {
                 // Kijk of de speler zich zelf schiet
-                if (obj.get("color") == "magenta") {
-                    return false;
+                if (obj == player) {
+                    return;
                 }
-                console.log("obj",obj);
                 // kijk of het object er nog is
                 if (obj != null) {
                     // pak alle x en y coordinaten van het object
@@ -194,15 +190,15 @@ $(function(){
                                 // als het object geraakt is, verwijder het
                                 // en throw een error zodat hij de functie afbreekt
                                 c.remove(obj);
-                                throw "Quit function";
-                            }   
+                                throw "Raak";
+                            }
                         }
                     }
                 }
             });
         }
         catch (e) {
-            console.debug("Raak");
+            console.debug(e);
         }
 
         
