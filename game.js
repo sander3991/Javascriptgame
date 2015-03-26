@@ -1,7 +1,7 @@
 $(function(){
     var canvas = $("canvas");
-    var scoreCounter = 0;
-
+    
+    
 
     var GameController = Backbone.Model.extend({
         initialize: function(){
@@ -74,11 +74,33 @@ $(function(){
         }
     });
 
+    var ScoreModel = Backbone.Model.extend({
+        defaults: {
+            CurrentScore: 0,
+            PosX: 0,
+            PosY: 0
+        }
+    });
+    var ScoreView = Backbone.View.extend({
+        render: function () {
+            var model = this.model, ctx = this.ctx;
+            ctx.font = "48px serif";
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 1;
+            ctx.strokeText("Score: " + model.get("CurrentScore"), 10, 50);
+        },
+        initialize: function (params) {
+            this.ctx = params.ctx;
+        }
+    });
+    
+
     var SetView= Backbone.View.extend({
         initialize: function(args) {
             this.shotCollection = args.shotCollection;
             this.listenTo(this.collection, "all", this.render);
             this.listenTo(this.shotCollection, "all", this.render);
+            this.scoreView = args.scoreView;
             this.ctx =  this.el.getContext("2d");
         },
 
@@ -94,6 +116,9 @@ $(function(){
                 if(!model.view) model.view = new ShotView({ctx: ctx, model:model});
                 model.view.render();
             });
+            if (!this.scoreView.view) this.scoreView.view = new ScoreView({ ctx: ctx, model: this.scoreView });
+            this.scoreView.view.render();
+
             this.lastRender = new Date().getTime();
         }
     });
@@ -205,16 +230,18 @@ $(function(){
                 break;
         }
     }
+    // Standaard spawn rate van vijanden
     var enemySpawnRate = 60;
     GC.register(function (tick) {
         if (tick % enemySpawnRate == 0) {
             addEnemy();
+            // Haal 20% van de spawnrate af bij elke spawn van een vijand
             Math.round(enemySpawnRate / 5 * 4);
             
         }
 
     });
-   
+    
 
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
@@ -256,10 +283,12 @@ $(function(){
         }
     });
     var shots = new ShotSet();
+    var Score = new ScoreModel();
     var v = new SetView({
         el: canvas[0],
         collection : c,
-        shotCollection: shots
+        shotCollection: shots,
+        scoreView: Score
     });
     v.render();
     var AudioElement = function(src){
@@ -314,8 +343,8 @@ $(function(){
                                 // als het object geraakt is, verwijder het
                                 // en throw een error zodat hij de functie afbreekt
                                 c.remove(obj);
-                                scoreCounter++;
-                                console.debug(scoreCounter);
+                                Score.set("CurrentScore", Score.get("CurrentScore") + 1);
+                                
                                 throw "Raak";
                             }
                         }
