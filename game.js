@@ -254,11 +254,11 @@ $(function(){
         c.reset();
         player.set({x: 487, y: 237});
         Score.set("CurrentScore", 0);
+        enemySpawnRate = 300;
         c.add(player);
         addEnemy();
         addEnemy();
         GC.start();
-        enemySpawnRate = 300;
     }
 
     // Standaard spawn rate van vijanden
@@ -268,6 +268,7 @@ $(function(){
             addEnemy();
             // Haal 4% van de spawnrate af bij elke spawn van een vijand
             enemySpawnRate = Math.round(enemySpawnRate / 50 * 48);
+            console.debug("spawnrate",enemySpawnRate);
         }
 
     });
