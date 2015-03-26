@@ -60,7 +60,7 @@ $(function(){
             );
 
             ctx.globalAlpha = 1;
-            ctx.strokeStyle = model.get("color");
+            ctx.strokeStyle = model.get("strokeColor") || model.get("color");
             ctx.lineWidth = model.get("linewidth");
             ctx.strokeRect(
                 model.get("x"), model.get("y"),
@@ -122,7 +122,7 @@ $(function(){
             this.lastRender = new Date().getTime();
         }
     });
-    var player = new Box({x: 487, y: 237, color: 'magenta'});
+    var player = new Box({x: 487, y: 237, color: 'magenta', strokeColor: 'blue'});
     function inBounds(from, to, value){
         if(value > to) return to;
         if(from > value) return from;
