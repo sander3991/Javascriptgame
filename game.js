@@ -232,29 +232,38 @@ $(function(){
                 break;
         }
     });
-
+    function getRandomColor() {
+        var letters = '0123456789ABCD'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
     // voeg een vijand toe aan een willekeurige plek in het scherm
     function addEnemy() {
         var spawnPosition = getRandomInt(1, 5);
+        var color = getRandomColor();
         switch (spawnPosition) {
             case (1): // spawn enemy boven in het scherm
                 var tempX = getRandomInt(0, 1000);
-                c.add(new Box({ x: tempX, y: 10 }));
+                c.add(new Box({ x: tempX, y: -25 ,color:color}));
                 break;
             case (2): // spawn enemy onder in het scherm
                 var tempX = getRandomInt(0, 1000);
-                c.add(new Box({ x: tempX, y: 450 }));
+                c.add(new Box({ x: tempX, y: 525, color: color }));
                 break;
             case (3): //spawn enemy links in het scherm
                 var tempY = getRandomInt(0, 500)
-                c.add(new Box({ x: 0, y: tempY }));
+                c.add(new Box({ x: -25, y: tempY, color: color }));
                 break;
             case (4): // spawn enemy rechts in het scherm
                 var tempY = getRandomInt(0, 500)
-                c.add(new Box({ x: 950, y: tempY }));
+                c.add(new Box({ x: 1025, y: tempY, color: color }));
                 break;
         }
     }
+    
 
     function restartGame(){
         c.reset();
