@@ -123,7 +123,7 @@ $(function(){
             var model = this.model, ctx = this.ctx;
             ctx.beginPath();
             ctx.lineWidth = 1;
-            ctx.strokeStyle = "yellow";
+            ctx.strokeStyle = "blue";
             ctx.moveTo(model.get("fromX"), model.get("fromY"));
             ctx.lineTo(model.get("toX"), model.get("toY"));
             ctx.closePath();
@@ -162,7 +162,9 @@ $(function(){
     };
     var shootAudio = new AudioElement("Javascriptgame/laser.mp3");
     canvas.on("click", function(e){
-        var shot = new Shot({fromX: player.get("x") + 12.5, fromY: player.get("y") + 12.5, toX:e.offsetX, toY:e.offsetY});
+        var shot = new Shot({ fromX: player.get("x") + 12.5, fromY: player.get("y") + 12.5, toX: e.offsetX, toY: e.offsetY });
+        console.debug("shot", shot);
+
         shootAudio.play();
         shots.add(shot);
 
@@ -173,7 +175,6 @@ $(function(){
             shots.remove(shot);
         }, 100)
     });
-
 
     function checkCollision(shot, c) {
         try {
