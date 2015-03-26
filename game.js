@@ -383,4 +383,14 @@ $(function(){
         '-moz-user-select': 'none',
         '-ms-user-select': 'none'
     });
+    var parent = canvas.parent();
+    $(window).on("resize",function(){
+       if(parent.width() <  canvas.width()){
+           canvas.css("margin-left", "0");
+       }else{
+            canvas.css("margin-left", ((parent.width() - canvas.width()) / 2) + "px");
+       }
+
+    });
+    $(window).trigger("resize");
 });
