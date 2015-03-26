@@ -104,6 +104,8 @@ $(function(){
     c.add(player);
     c.add(new Box({x: 150, y: 150}));
     c.add(new Box({ x: 10, y: 10 }));
+    
+    
 
     GC.register(function(){
         var playerX = player.get("x"),
@@ -177,6 +179,35 @@ $(function(){
                 break;
         }
     });
+
+    // voeg een vijand toe aan een willekeurige plek in het scherm
+    function addEnemy() {
+        var spawnPosition = getRandomInt(1, 5);
+        switch (spawnPosition) {
+            case (1): // spawn enemy boven in het scherm
+                var tempX = getRandomInt(0, 1000);
+                c.add(new Box({ x: tempX, y: 10 }));
+                break;
+            case (2): // spawn enemy onder in het scherm
+                var tempX = getRandomInt(0, 1000);
+                c.add(new Box({ x: tempX, y: 450 }));
+                break;
+            case (3): //spawn enemy links in het scherm
+                var tempY = getRandomInt(0, 500)
+                c.add(new Box({ x: 0, y: tempY }));
+                break;
+            case (4): // spawn enemy rechts in het scherm
+                var tempY = getRandomInt(0, 500)
+                c.add(new Box({ x: 950, y: tempY }));
+                break;
+        }
+    }
+
+    addEnemy();
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
 
 
     function movePlayer(direction) {
@@ -255,6 +286,7 @@ $(function(){
     });
 
     function checkCollision(shot, c) {
+        
         try {
             c.each(function (obj) {
                 // Kijk of de speler zich zelf schiet
