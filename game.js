@@ -332,7 +332,7 @@ $(function(){
                                 c.remove(obj);
                                 scoreCounter++;
                                 console.debug(scoreCounter);
-                                throw "Raak";
+                                //throw "Raak";
                             }
                         }
                     }
@@ -345,5 +345,11 @@ $(function(){
     }
 
     GC.start();
-
+    canvas.css({
+        cursor:"url(Javascriptgame/cursor.png) 32 32, auto",
+        'user-select': "none",
+        '-webkit-user-select': 'none',
+        '-moz-user-select': 'none',
+        '-ms-user-select': 'none'
+    });
 });
