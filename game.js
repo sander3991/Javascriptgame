@@ -329,6 +329,7 @@ $(function(){
     };
     var shootAudio = new AudioElement("Javascriptgame/laser.mp3");
     canvas.on("click", function(e){
+        if(!GC.running()) return;
         var shot = new Shot({ fromX: player.get("x") + 12.5, fromY: player.get("y") + 12.5, toX: e.offsetX, toY: e.offsetY });
         shootAudio.play();
         shots.add(shot);
