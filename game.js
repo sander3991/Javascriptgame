@@ -83,9 +83,10 @@ $(function(){
         render: function () {
             var model = this.model, ctx = this.ctx;
             ctx.font = "48px serif";
-            ctx.strokeStyle = this.textColor;
+            ctx.fillStyle = this.textColor;
+            ctx.globalAlpha = 0.7;
             ctx.lineWidth = 1;
-            ctx.strokeText("Score: " + model.get("CurrentScore"), 10, 50);
+            ctx.fillText("Score: " + model.get("CurrentScore"), 10, 50);
         },
         initialize: function (params) {
             this.ctx = params.ctx;
@@ -131,9 +132,9 @@ $(function(){
 
     GC.register(function(){
         if(player.moveX)
-            player.set("x", player.get("x") + player.moveX);
+            player.set("x", inBounds(0, 975, player.get("x") + player.moveX));
         if(player.moveY)
-            player.set("y", player.get("y") + player.moveY);
+            player.set("y", inBounds(0, 475, player.get("y") + player.moveY));
     });
     var c = new BoxSet();
     c.add(player);
@@ -399,7 +400,7 @@ $(function(){
                         h = obj.get("h");
                     if(
                         toX >= x && (x + w) >= toX &&
-                        toY >= y && (x + h) >= toY
+                        toY >= y && (y + h) >= toY
                     ){
                         // als het object geraakt is, verwijder het
                         // en throw een error zodat hij de functie afbreekt
