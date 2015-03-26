@@ -6,10 +6,12 @@ $(function(){
             this.loops = [];
         },
         start: function(){
-            this.interval = setInterval(function(funcs){
-                for(var i = 0; i < funcs.length; i++ )
-                    funcs[i]();
-            }, 16, this.loops);
+            this.ticker = 0;
+            this.interval = setInterval(function(controller){
+                ++controller.ticker;
+                for(var i = 0; i < controller.loops.length; i++ )
+                    controller.loops[i](controller.ticker);
+            }, 16, this);
         },
         running: function(){
             return this.interval != undefined;
@@ -104,8 +106,8 @@ $(function(){
     c.add(player);
     c.add(new Box({x: 150, y: 150}));
     c.add(new Box({ x: 10, y: 10 }));
-    
-    
+
+
 
     GC.register(function(){
         var playerX = player.get("x"),
@@ -137,7 +139,7 @@ $(function(){
             case 37: //links
             case 65: //a
                 player.moveX = -1;
-                
+
                 break;
             case 38: //boven
             case 87: //u
@@ -146,7 +148,7 @@ $(function(){
             case 39: //rechts
             case 68: //d
                 player.moveX = 1;
-                
+
                 break;
             case 40: //down
             case 83: //s
@@ -277,7 +279,7 @@ $(function(){
         shootAudio.play();
         shots.add(shot);
 
-        // Check collisie 
+        // Check collisie
         checkCollision(shot, c);
 
         setTimeout(function(){
@@ -286,7 +288,7 @@ $(function(){
     });
 
     function checkCollision(shot, c) {
-        
+
         try {
             c.each(function (obj) {
                 // Kijk of de speler zich zelf schiet
