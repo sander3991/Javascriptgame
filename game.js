@@ -1,8 +1,6 @@
 $(function(){
     var canvas = $("canvas");
     
-    
-
     var GameController = Backbone.Model.extend({
         initialize: function(){
             this.loops = [];
@@ -252,10 +250,8 @@ $(function(){
     GC.register(function (tick) {
         if (tick % enemySpawnRate == 0) {
             addEnemy();
-            // Haal 20% van de spawnrate af bij elke spawn van een vijand
+            // Haal 4% van de spawnrate af bij elke spawn van een vijand
             enemySpawnRate = Math.round(enemySpawnRate / 50 * 48);
-            console.debug("spawnrate ", enemySpawnRate);
-            
         }
 
     });
@@ -373,7 +369,6 @@ $(function(){
             });
         }
         catch (e) {
-            console.debug(e);
         }
     }
 
