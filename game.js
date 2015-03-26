@@ -1,5 +1,34 @@
 $(function(){
     var canvas = $("canvas");
+
+    var GameController = Backbone.Model.extend({
+        initialize: function(){
+            this.loops = [];
+        },
+        start: function(){
+            this.interval = setInterval(function(funcs){
+                for(var i = 0; i < funcs.length; i++ )
+                    funcs[i]();
+            }, 16, this.loops);
+        },
+        running: function(){
+            return this.interval != undefined;
+        },
+        stop: function(){
+            if(this.interval){
+                clearInterval(this.interval);
+                this.interval = undefined;
+            }
+        },
+        register: function(func){
+            if(typeof func == "function")
+                this.loops.push(func);
+            else
+                console.error("Tried to register a non-function");
+        }
+    });
+    var GC = new GameController();
+    console.debug(GC);
     var Box = Backbone.Model.extend({
         defaults: {
             x: 0,
@@ -65,10 +94,38 @@ $(function(){
         }
     });
     var player = new Box({x: 0, y: 450, color: 'magenta'});
+    GC.register(function(){
+        if(player.moveX)
+            player.set("x", player.get("x") + player.moveX);
+        if(player.moveY)
+            player.set("y", player.get("y") + player.moveY);
+    });
     var c = new BoxSet();
     c.add(player);
     c.add(new Box({x: 150, y: 150}));
     c.add(new Box({ x: 10, y: 10 }));
+
+    GC.register(function(){
+        var playerX = player.get("x"),
+            playerY = player.get("y");
+        c.each(function(obj){
+            if(obj == player) return;
+            var x = obj.get("x"),
+                y = obj.get("y");
+            if(x != playerX){
+                if(x > playerX)
+                    obj.set("x", --x);
+                else
+                    obj.set("x", ++x);
+            }
+            if(y != playerY){
+                if(y > playerY)
+                    obj.set("y", --y);
+                else
+                    obj.set("y", ++y);
+            }
+        });
+    });
 
     var counter = 0;
     /* Henk Jan */
@@ -77,21 +134,46 @@ $(function(){
         switch(e.which){
             case 37: //links
             case 65: //a
-                player.set({x: player.get("x") - 10});
+                player.moveX = -1;
                 
                 break;
             case 38: //boven
             case 87: //u
-                player.set({y: player.get("y") - 10});
+                player.moveY = -1;
                 break;
             case 39: //rechts
             case 68: //d
-                player.set({ x: player.get("x") + 10 });
+                player.moveX = 1;
                 
                 break;
             case 40: //down
             case 83: //s
-                player.set({y: player.get("y") + 10});
+                player.moveY = 1;
+                break;
+        }
+    });
+    $(document).keyup(function(e){
+        switch(e.which){
+            case 37: //links
+            case 65: //a
+                if(player.moveX == -1)
+                    player.moveX = undefined;
+                break;
+            case 38: //boven
+            case 87: //u
+                if(player.moveY == -1)
+                    player.moveY = undefined;
+                break;
+            case 39: //rechts
+            case 68: //d
+                if(player.moveX == 1)
+                    player.moveX = undefined;;
+
+                break;
+            case 40: //down
+            case 83: //s
+                if(player.moveY == 1)
+                    player.moveY = undefined;
                 break;
         }
     });
@@ -161,7 +243,6 @@ $(function(){
     var shootAudio = new AudioElement("Javascriptgame/laser.mp3");
     canvas.on("click", function(e){
         var shot = new Shot({ fromX: player.get("x") + 12.5, fromY: player.get("y") + 12.5, toX: e.offsetX, toY: e.offsetY });
-
         shootAudio.play();
         shots.add(shot);
 
@@ -200,9 +281,8 @@ $(function(){
         catch (e) {
             console.debug(e);
         }
-
-        
     }
-    
-    
+
+    GC.start();
+
 });
