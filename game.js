@@ -97,7 +97,7 @@ $(function(){
             this.lastRender = new Date().getTime();
         }
     });
-    var player = new Box({x: 0, y: 450, color: 'magenta'});
+    var player = new Box({x: 487, y: 237, color: 'magenta'});
     GC.register(function(){
         if(player.moveX)
             player.set("x", player.get("x") + player.moveX);
@@ -110,26 +110,42 @@ $(function(){
     c.add(new Box({ x: 10, y: 10 }));
 
 
-
+    function intersectRect(obj1, obj2) {
+        var r1 = {left: obj1.get("x"), top: obj1.get("y")};
+        r1.right = r1.left + obj1.get("w");
+        r1.bottom = r1.top + obj1.get("h");
+        var r2 = {left: obj2.get("x"), top: obj2.get("y")};
+        r2.right = r2.left + obj2.get("w");
+        r2.bottom = r2.top + obj2.get("h");
+        return !(r2.left > r1.right ||
+        r2.right < r1.left ||
+        r2.top > r1.bottom ||
+        r2.bottom < r1.top);
+    }
     GC.register(function(){
         var playerX = player.get("x"),
             playerY = player.get("y");
         c.each(function(obj){
             if(obj == player) return;
             var x = obj.get("x"),
-                y = obj.get("y");
+                y = obj.get("y"),
+                moved = false;
             if(x != playerX){
                 if(x > playerX)
                     obj.set("x", --x);
                 else
                     obj.set("x", ++x);
+                moved = true;
             }
             if(y != playerY){
                 if(y > playerY)
                     obj.set("y", --y);
                 else
                     obj.set("y", ++y);
+                moved = true;
             }
+            if(moved && intersectRect(player, obj))
+                GC.stop();
         });
     });
 
