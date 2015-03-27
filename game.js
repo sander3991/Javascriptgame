@@ -1,6 +1,7 @@
 $(function(){
     var canvas = $("canvas");
     
+    // Gamecontroller
     var GameController = Backbone.Model.extend({
         initialize: function(){
             this.loops = [];
@@ -30,7 +31,7 @@ $(function(){
         }
     });
     var GC = new GameController();
-    console.debug(GC);
+    
     var Box = Backbone.Model.extend({
         defaults: {
             x: 0,
@@ -40,7 +41,6 @@ $(function(){
             color: "#FF9000",
             linewidth: 3,
             alive: true
-            // don't define a default id, that leads to strange behaviors
         }
     });
 
@@ -138,9 +138,6 @@ $(function(){
     });
     var c = new BoxSet();
     c.add(player);
-    c.add(new Box({x: 150, y: 150}));
-    c.add(new Box({ x: 10, y: 10 }));
-
 
     function intersectRect(obj1, obj2) {
         var r1 = {left: obj1.get("x"), top: obj1.get("y")};
@@ -185,14 +182,12 @@ $(function(){
         });
     });
 
-    /* Henk Jan */
-
+    // Functie voor als een toets wordt ingedrukt
     $(document).keydown(function (e) {
         switch(e.which){
             case 37: //links
             case 65: //a
                 player.moveX = -1;
-
                 break;
             case 38: //boven
             case 87: //u
@@ -209,6 +204,7 @@ $(function(){
                 break;
         }
     });
+    // Functie voor als een toets lost wordt gelaten
     $(document).keyup(function(e){
         switch(e.which){
             case 37: //links
@@ -234,6 +230,7 @@ $(function(){
                 break;
         }
     });
+    // Functie om een random kleur te genereren
     function getRandomColor() {
         var letters = '0123456789ABCDEF'.split('');
         var color = '#';
@@ -267,12 +264,13 @@ $(function(){
         }
     }
     
-
+    // reset het spel
     function restartGame(){
         c.reset();
         player.set({x: 487, y: 237});
         Score.set("CurrentScore", 0);
         enemySpawnRate = 300;
+        numberOfEnemies = 2;
         c.add(player);
         addEnemy();
         addEnemy();
@@ -281,28 +279,27 @@ $(function(){
 
     // Standaard spawn rate van vijanden
     var enemySpawnRate = 300;
+    var numberOfEnemies = 2;
     GC.register(function (tick) {
         if (tick % enemySpawnRate == 0) {
-            addEnemy();
+            for (var i = 1; i <= numberOfEnemies; i++)
+                addEnemy();
             // Haal 4% van de spawnrate af bij elke spawn van een vijand
-            enemySpawnRate = Math.round(enemySpawnRate / 50 * 48);
-            console.debug("spawnrate",enemySpawnRate);
+            if (numberOfEnemies % 10 == 0) {
+                enemySpawnRate = Math.round(enemySpawnRate / 50 * 48);
+            }
+            numberOfEnemies++;
         }
-
     });
     
-
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
     }
-
 
     function movePlayer(direction) {
         player.set({ x: player.get("x") - 25 });
     }
 
-
-    /* Sander */
     var Shot = Backbone.Model.extend({
         defaults: {
             fromX: 0,
@@ -331,6 +328,7 @@ $(function(){
             this.ctx = params.ctx;
         }
     });
+
     var shots = new ShotSet();
     var Score = new ScoreModel();
     var v = new SetView({
@@ -339,10 +337,12 @@ $(function(){
         shotCollection: shots,
         scoreView: Score
     });
+
     v.render();
     var AudioElement = function(src){
         this.src = src;
     };
+
     AudioElement.prototype = {
         defaultElement: undefined,
         src: undefined,
@@ -360,6 +360,7 @@ $(function(){
             return  $("<audio/>").attr("src", this.src).attr("autoplay", "");
         }
     };
+
     var shootAudio = new AudioElement("Javascriptgame/laser.mp3");
     canvas.on("click", function(e){
         if(!GC.running()) return;
@@ -369,7 +370,6 @@ $(function(){
             toX: e.offsetX || e.pageX - canvas.offset().left,
             toY: e.offsetY || e.pageY - canvas.offset().top
         });
-        console.debug("Shot", shot);
         shootAudio.play();
         shots.add(shot);
 
@@ -382,7 +382,6 @@ $(function(){
     });
 
     function checkCollision(shot, c) {
-
         try {
             var toX = shot.get("toX"),
                 toY = shot.get("toY");
@@ -403,11 +402,12 @@ $(function(){
                         toY >= y && (y + h) >= toY
                     ){
                         // als het object geraakt is, verwijder het
-                        // en throw een error zodat hij de functie afbreekt
+                        
                         c.remove(obj);
 
                         Score.set("CurrentScore", Score.get("CurrentScore") + 1);
-                        throw "Raak";
+                        // return true zodat hij naar het volgende object gaat
+                        return true;
                     }
                 }
             });
