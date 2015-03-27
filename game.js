@@ -187,20 +187,20 @@ $(function(){
         switch(e.which){
             case 37: //links
             case 65: //a
-                player.moveX = -1;
+                player.moveX = -2;
                 break;
             case 38: //boven
             case 87: //u
-                player.moveY = -1;
+                player.moveY = -2;
                 break;
             case 39: //rechts
             case 68: //d
-                player.moveX = 1;
+                player.moveX = 2;
 
                 break;
             case 40: //down
             case 83: //s
-                player.moveY = 1;
+                player.moveY = 2;
                 break;
         }
     });
@@ -209,23 +209,23 @@ $(function(){
         switch(e.which){
             case 37: //links
             case 65: //a
-                if(player.moveX == -1)
+                if(player.moveX == -2)
                     player.moveX = undefined;
                 break;
             case 38: //boven
             case 87: //u
-                if(player.moveY == -1)
+                if(player.moveY == -2)
                     player.moveY = undefined;
                 break;
             case 39: //rechts
             case 68: //d
-                if(player.moveX == 1)
+                if(player.moveX == 2)
                     player.moveX = undefined;;
 
                 break;
             case 40: //down
             case 83: //s
-                if(player.moveY == 1)
+                if(player.moveY == 2)
                     player.moveY = undefined;
                 break;
         }
