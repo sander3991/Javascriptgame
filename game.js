@@ -268,6 +268,8 @@ $(function(){
     function restartGame(){
         c.reset();
         player.set({x: 487, y: 237});
+        player.moveX = 0;
+        player.moveY = 0;
         Score.set("CurrentScore", 0);
         enemySpawnRate = 300;
         numberOfEnemies = 2;
